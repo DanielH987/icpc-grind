@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { authModalState } from '@/atoms/authModalAtom';
 import { useSetRecoilState } from 'recoil';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { useSignInWithEmailAndPassword, useSignInWithGoogle  } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/router';
 import { auth } from "@/firebase/firebase";
+import GoogleSignInButton from '../GoogleSignInButton/GoogleSignInButton';
 
 type LoginProps = {
 
@@ -17,6 +18,13 @@ const Login: React.FC<LoginProps> = () => {
     };
 
     const [inputs, setInputs] = useState({ email: "", password: "" });
+
+    const [
+        signInWithGoogle, 
+        googleUser, 
+        googleLoading, 
+        googleError
+    ] = useSignInWithGoogle(auth);
 
     const [
         signInWithEmailAndPassword,
@@ -38,6 +46,17 @@ const Login: React.FC<LoginProps> = () => {
             router.push('/');
         } catch (error: any) {
             console.log(error.message);
+            alert(error.message);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            const result = await signInWithGoogle();
+            if (result) {
+                router.push('/');
+            }
+        } catch (error: any) {
             alert(error.message);
         }
     };
@@ -83,6 +102,16 @@ const Login: React.FC<LoginProps> = () => {
             '>
                 {loading ? 'Loading...' : 'Sign In'}
             </button>
+
+            {/* Divider */}
+            <div className="flex items-center my-4">
+                <hr className="w-full border-gray-500" />
+                <span className="px-3 text-gray-300 text-sm whitespace-nowrap">Or Continue with</span>
+                <hr className="w-full border-gray-500" />
+            </div>
+
+            <GoogleSignInButton onClick={handleGoogleSignIn} loading={googleLoading} />
+            
             <button className='flex w-full justify-end' onClick={() => handleClick('forgotPassword')}>
                 <a href="#" className='text-sm block text-brand-orange hover:underline w-full text-right'>
                     Forgot Password?
