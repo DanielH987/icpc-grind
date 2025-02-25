@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { authModalState } from '@/atoms/authModalAtom';
 import { useSetRecoilState } from 'recoil';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { useRouter } from 'next/router';
+import { auth } from "@/firebase/firebase";
 
 type SignupProps = {
 
@@ -9,6 +11,7 @@ type SignupProps = {
 
 const Signup: React.FC<SignupProps> = () => {
     const setAuthModalState = useSetRecoilState(authModalState);
+    const router = useRouter();
     const handleClick = (type: "login" | "register" | "forgotPassword") => {
         setAuthModalState((prev) => ({ ...prev, type }));
     };
@@ -35,7 +38,10 @@ const Signup: React.FC<SignupProps> = () => {
         try {
             const newUser = await createUserWithEmailAndPassword(inputs.email, inputs.password);
             if (!newUser) return;
-        } catch (error:any) {
+            router.push('/');
+        } catch (error: any) {
+            console.log(error.message);
+            console.log(inputs);
             alert(error.message);
         }
     };
