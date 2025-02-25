@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { authModalState } from '@/atoms/authModalAtom';
 import { useSetRecoilState } from 'recoil';
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { useCreateUserWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/router';
 import { auth } from "@/firebase/firebase";
+import GoogleSignInButton from '../GoogleSignInButton/GoogleSignInButton';
 
 type SignupProps = {
 
@@ -21,6 +22,13 @@ const Signup: React.FC<SignupProps> = () => {
         displayName: '',
         password: ''
     });
+
+    const [
+        signInWithGoogle, 
+        googleUser, 
+        googleLoading, 
+        googleError
+    ] = useSignInWithGoogle(auth);
 
     const [
         createUserWithEmailAndPassword,
@@ -42,7 +50,17 @@ const Signup: React.FC<SignupProps> = () => {
             router.push('/');
         } catch (error: any) {
             console.log(error.message);
-            console.log(inputs);
+            alert(error.message);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            const result = await signInWithGoogle();
+            if (result) {
+                router.push('/');
+            }
+        } catch (error: any) {
             alert(error.message);
         }
     };
@@ -101,6 +119,16 @@ const Signup: React.FC<SignupProps> = () => {
             '>
                 {loading ? 'Loading...' : 'Register'}
             </button>
+            
+            {/* Divider */}
+            <div className="flex items-center my-4">
+                <hr className="w-full border-gray-500" />
+                <span className="px-3 text-gray-300 text-sm whitespace-nowrap">Or Continue with</span>
+                <hr className="w-full border-gray-500" />
+            </div>
+
+            <GoogleSignInButton onClick={handleGoogleSignIn} loading={googleLoading} />
+
             <div className='text-sm font-medium text-gray-300'>
                 Already have an account? {' '}
                 <a href="#" className='text-blue-700 hover:underline' onClick={() => handleClick('login')}>
