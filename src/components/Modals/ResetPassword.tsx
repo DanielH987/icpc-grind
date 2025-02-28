@@ -21,7 +21,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = () => {
 
 	useEffect(() => {
 		if (error) {
-			toast.error('Error sending password reset email!', { position: 'top-center', autoClose: 3000 });
+			toast.error(error.message, { position: 'top-center', autoClose: 3000 });
 		}
 	}, [error]);
 
