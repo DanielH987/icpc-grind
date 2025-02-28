@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { auth } from '@/firebase/firebase';
 import { useSendPasswordResetEmail } from 'react-firebase-hooks/auth';
+import { toast } from 'react-toastify';
 
 type ResetPasswordProps = {
 
@@ -13,17 +14,17 @@ const ResetPassword: React.FC<ResetPasswordProps> = () => {
 		e.preventDefault();
 		const success = await sendPasswordResetEmail(email);
 		if (success) {
-			alert('Password reset email sent!');
+			toast.success('Password reset email sent!', { position: 'top-center', autoClose: 3000 });
 		}
 		console.log(success);
 	};
 
 	useEffect(() => {
 		if (error) {
-			alert('Error sending password reset email!');
+			toast.error('Error sending password reset email!', { position: 'top-center', autoClose: 3000 });
 		}
 	}, [error]);
-	
+
 	return (
 		<form className='space-y-6 px-6 lg:px-8 pb-4 sm:pb-6 xl:pb-8' onSubmit={handleReset}>
 			<h3 className='text-xl font-medium  text-white'>Reset Password</h3>
