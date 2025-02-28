@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { authModalState } from '@/atoms/authModalAtom';
 import { useSetRecoilState } from 'recoil';
-import { useSignInWithEmailAndPassword, useSignInWithGoogle  } from 'react-firebase-hooks/auth';
+import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/router';
 import { auth } from "@/firebase/firebase";
 import GoogleSignInButton from '../GoogleSignInButton/GoogleSignInButton';
+import { toast } from 'react-toastify';
 
 type LoginProps = {
 
@@ -20,9 +21,9 @@ const Login: React.FC<LoginProps> = () => {
     const [inputs, setInputs] = useState({ email: "", password: "" });
 
     const [
-        signInWithGoogle, 
-        googleUser, 
-        googleLoading, 
+        signInWithGoogle,
+        googleUser,
+        googleLoading,
         googleError
     ] = useSignInWithGoogle(auth);
 
@@ -39,14 +40,14 @@ const Login: React.FC<LoginProps> = () => {
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!inputs.email || !inputs.password) return alert('Please fill all fields');
+        if (!inputs.email || !inputs.password) return toast.error('Please fill all fields', { position: 'top-center', autoClose: 3000 });;
         try {
             const newUser = await signInWithEmailAndPassword(inputs.email, inputs.password);
             if (!newUser) return;
             router.push('/');
         } catch (error: any) {
             console.log(error.message);
-            alert(error.message);
+            toast.error(error.message, { position: 'top-center', autoClose: 3000 });
         }
     };
 
@@ -57,13 +58,13 @@ const Login: React.FC<LoginProps> = () => {
                 router.push('/');
             }
         } catch (error: any) {
-            alert(error.message);
+            toast.error(error.message, { position: 'top-center', autoClose: 3000 });
         }
     };
-    
+
     useEffect(() => {
         if (error) {
-            alert(error.message);
+            toast.error(error.message, { position: 'top-center', autoClose: 3000 });
         }
     }, [error]);
 
@@ -111,7 +112,7 @@ const Login: React.FC<LoginProps> = () => {
             </div>
 
             <GoogleSignInButton onClick={handleGoogleSignIn} loading={googleLoading} />
-            
+
             <button className='flex w-full justify-end' onClick={() => handleClick('forgotPassword')}>
                 <a href="#" className='text-sm block text-brand-orange hover:underline w-full text-right'>
                     Forgot Password?
