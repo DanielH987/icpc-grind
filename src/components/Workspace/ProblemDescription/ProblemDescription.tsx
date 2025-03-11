@@ -2,13 +2,14 @@ import CircleSkeleton from "@/components/Skeletons/CircleSkeleton";
 import RectangleSkeleton from "@/components/Skeletons/RectangleSkeleton";
 import { auth, fireStore } from "@/firebase/firebase";
 import { DBProblem, Problem } from "@/utils/types/problem";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, runTransaction } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { AiFillLike, AiFillDislike } from "react-icons/ai";
+import { AiFillLike, AiFillDislike, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsCheck2Circle } from "react-icons/bs";
 import { TiStarOutline } from "react-icons/ti";
+import { toast } from "react-toastify";
 
 type ProblemDescriptionProps = {
 	problem: Problem
@@ -16,8 +17,71 @@ type ProblemDescriptionProps = {
 
 const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 
-	const { currentproblem, loading, problemDifficultyClass } = useGetCurrentProblem(problem.id);
+	const { currentproblem, loading, problemDifficultyClass, setCurrentProblem } = useGetCurrentProblem(problem.id);
 	const { liked, disliked, starred, solved, setData } = useGetUsersDataOnProblem(problem.id);
+	const [user] = useAuthState(auth);
+	const [updating, setUpdating] = useState(false);
+
+	const handleLike = async () => {
+		if (!user) {
+			toast.error("You need to login to like a problem", { position: "top-left", theme: "dark" });
+			return
+		}
+		
+		if (updating) return;
+
+		setUpdating(true);
+
+		await runTransaction(fireStore, async (transaction) => {
+			const userRef = doc(fireStore, "users", user.uid);
+			const problemRef = doc(fireStore, "problems", problem.id);
+			const userDoc = await transaction.get(userRef);
+			const problemDoc = await transaction.get(problemRef);
+
+			if (userDoc.exists() && problemDoc.exists()) {
+				if (liked) {
+
+					transaction.update(userRef, {
+						likedProblems: userDoc.data().likedProblems.filter((id: string) => id !== problem.id)
+					})
+					transaction.update(problemRef, {
+						likes: problemDoc.data().likes - 1
+					})
+
+					setCurrentProblem(prev => ({ ...prev, likes: prev.likes - 1 }))
+					setData(prev => ({ ...prev, liked: false }))
+
+				} else if (disliked) {
+
+					transaction.update(userRef, {
+						likedProblems: [...userDoc.data().likedProblems, problem.id],
+						dislikedProblems: userDoc.data().dislikedProblems.filter((id: string) => id !== problem.id)
+					})
+					transaction.update(problemRef, {
+						likes: problemDoc.data().likes + 1,
+						dislikes: problemDoc.data().dislikes - 1
+					})
+
+					setCurrentProblem(prev => ({ ...prev, likes: prev.likes + 1, dislikes: prev.dislikes - 1 }))
+					setData(prev => ({ ...prev, liked: true, disliked: false }))
+
+				} else {
+
+					transaction.update(userRef, {
+						likedProblems: [...userDoc.data().likedProblems, problem.id]
+					})
+					transaction.update(problemRef, {
+						likes: problemDoc.data().likes + 1
+					})
+
+					setCurrentProblem(prev => ({ ...prev, likes: prev.likes + 1 }))
+					setData(prev => ({ ...prev, liked: true }))
+				}
+			}
+		});
+
+		setUpdating(false);
+	};
 
 	return (
 		<div className='bg-dark-layer-1'>
@@ -45,8 +109,12 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 								<div className='rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-green-s'>
 									<BsCheck2Circle />
 								</div>
-								<div className='flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px]  ml-4 text-lg transition-colors duration-200 text-dark-gray-6'>
-									<AiFillLike />
+								<div className='flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px]  ml-4 text-lg transition-colors duration-200 text-dark-gray-6'
+									onClick={handleLike}
+								>
+									{liked && !updating && <AiFillLike className='text-dark-blue-s' />}
+									{!liked && <AiFillLike />}
+									{updating && <AiOutlineLoading3Quarters className="animate-spin" />}
 									<span className='text-xs'>{currentproblem.likes}</span>
 								</div>
 								<div className='flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px]  ml-4 text-lg transition-colors duration-200 text-green-s text-dark-gray-6'>
@@ -148,7 +216,7 @@ function useGetCurrentProblem(problemId: string) {
 		getCurrentProblem();
 	}, [problemId]);
 
-	return { currentproblem, loading, problemDifficultyClass };
+	return { currentproblem, loading, problemDifficultyClass, setCurrentProblem };
 }
 
 function useGetUsersDataOnProblem(problemId: string) {
