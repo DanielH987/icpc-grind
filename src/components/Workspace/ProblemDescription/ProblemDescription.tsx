@@ -1,3 +1,5 @@
+import CircleSkeleton from "@/components/Skeletons/CircleSkeleton";
+import RectangleSkeleton from "@/components/Skeletons/RectangleSkeleton";
 import { fireStore } from "@/firebase/firebase";
 import { DBProblem, Problem } from "@/utils/types/problem";
 import { doc, getDoc } from "firebase/firestore";
@@ -52,6 +54,16 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 								<div className='cursor-pointer hover:bg-dark-fill-3  rounded p-[3px]  ml-4 text-xl transition-colors duration-200 text-green-s text-dark-gray-6 '>
 									<TiStarOutline />
 								</div>
+							</div>
+						)}
+
+						{loading && (
+							<div className="mt-3 flex space-x-2">
+								<RectangleSkeleton />
+								<CircleSkeleton />
+								<RectangleSkeleton />
+								<RectangleSkeleton />
+								<CircleSkeleton />
 							</div>
 						)}
 
