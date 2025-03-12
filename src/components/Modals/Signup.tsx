@@ -3,8 +3,10 @@ import { authModalState } from '@/atoms/authModalAtom';
 import { useSetRecoilState } from 'recoil';
 import { useCreateUserWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/router';
-import { auth } from "@/firebase/firebase";
+import { auth, fireStore } from "@/firebase/firebase";
 import GoogleSignInButton from '../GoogleSignInButton/GoogleSignInButton';
+import { doc, setDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 
 type SignupProps = {
 
@@ -24,9 +26,9 @@ const Signup: React.FC<SignupProps> = () => {
     });
 
     const [
-        signInWithGoogle, 
-        googleUser, 
-        googleLoading, 
+        signInWithGoogle,
+        googleUser,
+        googleLoading,
         googleError
     ] = useSignInWithGoogle(auth);
 
@@ -45,29 +47,74 @@ const Signup: React.FC<SignupProps> = () => {
         e.preventDefault();
         if (!inputs.email || !inputs.password || !inputs.displayName) return alert('Please fill all fields');
         try {
+            toast.loading('Registering...', { position: 'top-center', toastId: 'loadingToast' });
             const newUser = await createUserWithEmailAndPassword(inputs.email, inputs.password);
             if (!newUser) return;
+
+            const userData = {
+                uid: newUser.user.uid,
+                email: newUser.user.email,
+                displayName: inputs.displayName,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                likedProblems: [],
+                dislikedProblems: [],
+                solvedProblems: [],
+                starredProblems: [],
+            }
+
+            await setDoc(doc(fireStore, 'users', newUser.user.uid), userData)
+
             router.push('/');
         } catch (error: any) {
-            console.log(error.message);
-            alert(error.message);
+            toast.error(error.message, { position: 'top-center' });
+        } finally {
+            toast.dismiss('loadingToast');
         }
     };
 
     const handleGoogleSignIn = async () => {
         try {
+            toast.loading('Registering...', { position: 'top-center', toastId: 'loadingToast' });
+    
             const result = await signInWithGoogle();
-            if (result) {
-                router.push('/');
+            console.log("Signup with Google:", result);
+    
+            if (!result || !result.user) {
+                throw new Error("Google sign-in failed.");
             }
-        } catch (error: any) {
-            alert(error.message);
+    
+            const userData = {
+                uid: result.user.uid,
+                email: result.user.email,
+                displayName: result.user.displayName,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                likedProblems: [],
+                dislikedProblems: [],
+                solvedProblems: [],
+                starredProblems: [],
+            };
+    
+            console.log(userData);
+    
+            await setDoc(doc(fireStore, 'users', result.user.uid), userData);
+    
+            router.push('/');
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message, { position: 'top-center' });
+            } else {
+                toast.error('An unexpected error occurred', { position: 'top-center' });
+            }
+        } finally {
+            toast.dismiss('loadingToast');
         }
-    };
+    };    
 
     useEffect(() => {
         if (error) {
-            alert(error.message);
+            toast.error(error.message, { position: 'top-center' });
         }
     }, [error]);
 
@@ -119,7 +166,7 @@ const Signup: React.FC<SignupProps> = () => {
             '>
                 {loading ? 'Loading...' : 'Register'}
             </button>
-            
+
             {/* Divider */}
             <div className="flex items-center my-4">
                 <hr className="w-full border-gray-500" />
