@@ -194,9 +194,11 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 								>
 									{currentproblem.difficulty}
 								</div>
-								<div className='rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-green-s'>
-									<BsCheck2Circle />
-								</div>
+								{solved && (
+									<div className='rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-green-s'>
+										<BsCheck2Circle />
+									</div>
+								)}
 								<div className='flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px]  ml-4 text-lg transition-colors duration-200 text-dark-gray-6'
 									onClick={handleLike}
 								>
