@@ -27,7 +27,7 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 			toast.error("You need to login to like a problem", { position: "top-left", theme: "dark" });
 			return
 		}
-		
+
 		if (updating) return;
 
 		setUpdating(true);
@@ -48,7 +48,7 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 						likes: problemDoc.data().likes - 1
 					})
 
-					setCurrentProblem(prev => ({ ...prev, likes: prev.likes - 1 }))
+					setCurrentProblem(prev => prev ? { ...prev, likes: prev.likes - 1 } : null)
 					setData(prev => ({ ...prev, liked: false }))
 
 				} else if (disliked) {
@@ -62,7 +62,7 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 						dislikes: problemDoc.data().dislikes - 1
 					})
 
-					setCurrentProblem(prev => ({ ...prev, likes: prev.likes + 1, dislikes: prev.dislikes - 1 }))
+					setCurrentProblem(prev => prev ? { ...prev, likes: prev.likes + 1, dislikes: prev.dislikes - 1 } : null)
 					setData(prev => ({ ...prev, liked: true, disliked: false }))
 
 				} else {
@@ -74,7 +74,7 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 						likes: problemDoc.data().likes + 1
 					})
 
-					setCurrentProblem(prev => ({ ...prev, likes: prev.likes + 1 }))
+					setCurrentProblem(prev => prev ? { ...prev, likes: prev.likes + 1 } : null)
 					setData(prev => ({ ...prev, liked: true }))
 				}
 			}
@@ -113,7 +113,7 @@ const ProblemDescription: React.FC<ProblemDescriptionProps> = ({ problem }) => {
 									onClick={handleLike}
 								>
 									{liked && !updating && <AiFillLike className='text-dark-blue-s' />}
-									{!liked && <AiFillLike />}
+									{!liked && !updating && <AiFillLike />}
 									{updating && <AiOutlineLoading3Quarters className="animate-spin" />}
 									<span className='text-xs'>{currentproblem.likes}</span>
 								</div>
