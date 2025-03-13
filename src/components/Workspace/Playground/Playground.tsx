@@ -12,6 +12,7 @@ import { toast, ToastOptions } from 'react-toastify';
 import { problems } from '@/utils/problems';
 import { useRouter } from 'next/router';
 import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 type PlaygroundProps = {
     problem: Problem;
@@ -28,8 +29,9 @@ export interface ISettings {
 const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved }) => {
     let [userCode, setUserCode] = useState<string>(problem.starterCode);
     const [activeTestCaseId, setActiveTestCaseId] = useState<number>(0);
+    const [fontSize, setFontSize] = useLocalStorage("lcc-fontSize", "16px");
     const [settings, setSettings] = useState<ISettings>({
-        fontSize: '16px',
+        fontSize: fontSize,
         settingModalIsOpen: false,
         dropdownIsOpen: false,
     });
@@ -57,13 +59,13 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                     setTimeout(() => {
                         setSuccess(false)
                     }, 4000);
-    
+
                     const userRef = doc(fireStore, 'users', user.uid);
                     await updateDoc(userRef, {
                         solvedProblems: arrayUnion(pid)
                     });
                     setSolved(true);
-                } 
+                }
             }
 
         } catch (error: any) {
