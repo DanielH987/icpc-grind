@@ -2,12 +2,12 @@ import React from 'react';
 import { BsChevronUp } from 'react-icons/bs';
 
 type EditorFooterProps = {
-    
+	handleSubmit: () => void;
 };
 
-const EditorFooter:React.FC<EditorFooterProps> = () => {
-    
-    return (
+const EditorFooter: React.FC<EditorFooterProps> = ({ handleSubmit }) => {
+
+	return (
 		<div className='flex bg-dark-layer-1 absolute bottom-0 z-10 w-full'>
 			<div className='mx-5 my-[10px] flex justify-between w-full'>
 				<div className='mr-2 flex flex-1 flex-nowrap items-center space-x-4'>
@@ -26,6 +26,7 @@ const EditorFooter:React.FC<EditorFooterProps> = () => {
 					</button>
 					<button
 						className='px-3 py-1.5 font-medium items-center transition-all focus:outline-none inline-flex text-sm text-white bg-dark-green-s hover:bg-green-3 rounded-lg'
+						onClick={handleSubmit}
 					>
 						Submit
 					</button>
