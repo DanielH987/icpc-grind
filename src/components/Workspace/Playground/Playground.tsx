@@ -7,25 +7,28 @@ import { javascript } from '@codemirror/lang-javascript';
 import EditorFooter from './EditorFooter';
 import { Problem } from '@/utils/types/problem';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/firebase/firebase';
-import { toast } from 'react-toastify';
+import { auth, fireStore } from '@/firebase/firebase';
+import { toast, ToastOptions } from 'react-toastify';
 import { problems } from '@/utils/problems';
 import { useRouter } from 'next/router';
+import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
 
 type PlaygroundProps = {
     problem: Problem;
     setSuccess: React.Dispatch<React.SetStateAction<boolean>>;
+    setSolved: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess }) => {
+const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved }) => {
     const [activeTestCaseId, setActiveTestCaseId] = useState<number>(0);
     const [userCode, setUserCode] = useState<string>(problem.starterCode);
-    const user = useAuthState(auth);
+    const [user] = useAuthState(auth);
     const { query: { pid } } = useRouter();
+    const toastConfig: ToastOptions = { position: 'top-center', autoClose: 3000, theme: 'dark' };
 
     const handleSubmit = async () => {
         if (!user) {
-            toast.error('Please login to submit your code', { position: 'top-center', autoClose: 3000, theme: 'dark' });
+            toast.error('Please login to submit your code', toastConfig);
             return;
         }
 
@@ -34,14 +37,26 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess }) => {
             const success = problems[pid as string].handlerFunction(cb);
 
             if (success) {
-                toast.success('Congrats! All tests passed!', { position: 'top-center', autoClose: 3000, theme: 'dark' });
+                toast.success('Congrats! All tests passed!', toastConfig);
                 setSuccess(true);
                 setTimeout(() => {
                     setSuccess(false)
                 }, 4000);
             }
-        } catch (error) {
-            console.error(error);
+
+            const userRef = doc(fireStore, 'users', user.uid);
+            await updateDoc(userRef, {
+                solvedProblems: arrayUnion(pid)
+            });
+            setSolved(true);
+
+        } catch (error: any) {
+            console.log(error);
+            if (error.message.startsWith('AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:')) {
+                toast.error('Some tests failed! Please check your code and try again', toastConfig);
+            } else {
+                toast.error('An error occurred while running your code', toastConfig);
+            }
         }
     };
 
