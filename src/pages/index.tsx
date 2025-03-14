@@ -2,39 +2,39 @@ import Topbar from "@/components/Topbar/Topbar";
 import ProblemsTable from "@/components/ProblemsTable/ProblemsTable";
 import { useState } from "react";
 import useHasMounted from "@/hooks/useHasMounted";
-// import { doc, setDoc } from "firebase/firestore";
-// import { fireStore } from "@/firebase/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { fireStore } from "@/firebase/firebase";
 
 export default function Home() {
-  // const [inputs, setInputs] = useState({
-  //   id: "",
-  //   title: "",
-  //   difficulty: "",
-  //   category: "",
-  //   order: 0,
-  //   videoId: "",
-  //   link: "",
-  //   likes: 0,
-  //   dislikes: 0,
-  // });
+  const [inputs, setInputs] = useState({
+    id: "",
+    title: "",
+    difficulty: "",
+    category: "",
+    order: 0,
+    videoId: "",
+    link: "",
+    likes: 0,
+    dislikes: 0,
+  });
 
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   setInputs({
-  //     ...inputs,
-  //     [name]: value,
-  //   });
-  // }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInputs({
+      ...inputs,
+      [name]: value,
+    });
+  }
 
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   const newProblem = {
-  //     ...inputs,
-  //     order: Number(inputs.order),
-  //   }
-  //   await setDoc(doc(fireStore, "problems", inputs.id), newProblem);
-  //   alert("Problem added to DB");
-  // };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const newProblem = {
+      ...inputs,
+      order: Number(inputs.order),
+    }
+    await setDoc(doc(fireStore, "problems", inputs.id), newProblem);
+    alert("Problem added to DB");
+  };
 
   const [loadingProblems, setLoadingProblems] = useState(true);
   const hasMounted = useHasMounted();
@@ -88,7 +88,7 @@ export default function Home() {
         </div>
 
         {/* Temp Form */}
-        {/* <form className="p-6 flex flex-col max-w-sm gap-3" onSubmit={handleSubmit}>
+        <form className="p-6 flex flex-col max-w-sm gap-3" onSubmit={handleSubmit}>
           <input type="text" onChange={handleInputChange} placeholder="problem id" name="id" />
           <input type="text" onChange={handleInputChange} placeholder="title" name="title" />
           <input type="text" onChange={handleInputChange} placeholder="difficulty" name="difficulty" />
@@ -97,7 +97,7 @@ export default function Home() {
           <input type="text" onChange={handleInputChange} placeholder="videoId?" name="videoId" />
           <input type="text" onChange={handleInputChange} placeholder="link?" name="link" />
           <button className="bg-white">Save to DB</button>
-        </form> */}
+        </form>
       </main>
     </>
   );
