@@ -12,9 +12,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>ICPC Grind</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <meta name="description" content="A focused platform for ICPC preparation." />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
       </Head>
-      <ToastContainer/>
+      <ToastContainer />
       <Component {...pageProps} />
     </RecoilRoot>
   );
