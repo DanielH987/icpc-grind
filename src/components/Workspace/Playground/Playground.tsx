@@ -5,6 +5,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
+import { cpp } from '@codemirror/lang-cpp';
 import EditorFooter from './EditorFooter';
 import { Problem } from '@/utils/types/problem';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -25,20 +26,32 @@ export interface ISettings {
     fontSize: string;
     settingModalIsOpen: boolean;
     dropdownIsOpen: boolean;
+    language: 'javascript' | 'python' | 'cpp';
 };
 
 const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved }) => {
     let [userCode, setUserCode] = useState<string>(problem.starterCode);
+    const [language, setLanguage] = useState<'javascript' | 'python' | 'cpp'>('javascript');
     const [activeTestCaseId, setActiveTestCaseId] = useState<number>(0);
     const [fontSize, setFontSize] = useLocalStorage("lcc-fontSize", "16px");
     const [settings, setSettings] = useState<ISettings>({
         fontSize: fontSize,
         settingModalIsOpen: false,
         dropdownIsOpen: false,
+        language: 'javascript',
     });
     const [user] = useAuthState(auth);
     const { query: { pid } } = useRouter();
     const toastConfig: ToastOptions = { position: 'top-center', autoClose: 3000, theme: 'dark' };
+
+    const getLanguageExtension = () => {
+        switch (settings.language) {
+            case 'javascript': return javascript();
+            case 'python': return python();
+            case 'cpp': return cpp();
+            default: return javascript();
+        }
+    };
 
     const handleSubmit = async () => {
         if (!user) {
@@ -52,7 +65,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     code: userCode,
-                    language: 'javascript', // Adjust based on user selection
+                    language: settings.language,
                     expected_output: problem.examples[0].outputText
                 }),
             });
@@ -93,7 +106,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                         value={userCode}
                         theme={vscodeDark}
                         onChange={onCHange}
-                        extensions={[javascript()]}
+                        extensions={[getLanguageExtension()]}
                         style={{ fontSize: settings.fontSize }}
                     />
                 </div>
