@@ -29,8 +29,13 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ settings, setSettings }
       </Select.Trigger>
 
       <Select.Portal>
-        <Select.Content className="overflow-hidden bg-dark-fill-3 rounded shadow-lg border border-dark-fill-2 z-50">
-          <Select.Viewport className="p-1">
+        <Select.Content
+          side="bottom"
+          align="start"
+          position="popper"
+          className="bg-dark-layer-1 text-white rounded shadow-lg border border-dark-divider-border-2 z-50"
+        >
+          <Select.Viewport className="p-1 bg-dark-layer-1">
             {['javascript', 'python', 'cpp'].map((lang) => (
               <Select.Item
                 key={lang}
@@ -39,7 +44,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ settings, setSettings }
               >
                 <Select.ItemText>{lang === 'cpp' ? 'C++' : lang.charAt(0).toUpperCase() + lang.slice(1)}</Select.ItemText>
                 <Select.ItemIndicator>
-                  <CheckIcon className="text-green-400" />
+                  <CheckIcon />
                 </Select.ItemIndicator>
               </Select.Item>
             ))}
