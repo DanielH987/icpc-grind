@@ -47,35 +47,25 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         }
 
         try {
-            userCode = userCode.slice(userCode.indexOf(problem.starterFunctionName));
-            const cb = new Function(`return ${userCode}`)();
-            const handler = problems[pid as string].handlerFunction;
+            const response = await fetch('/api/execute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: userCode,
+                    language: 'javascript', // Adjust based on user selection
+                    expected_output: problem.examples[0].outputText
+                }),
+            });
 
-            if (typeof handler === 'function') {
-                const success = handler(cb);
+            const data = await response.json();
 
-                if (success) {
-                    toast.success('Congrats! All tests passed!', toastConfig);
-                    setSuccess(true);
-                    setTimeout(() => {
-                        setSuccess(false)
-                    }, 4000);
-
-                    const userRef = doc(fireStore, 'users', user.uid);
-                    await updateDoc(userRef, {
-                        solvedProblems: arrayUnion(pid)
-                    });
-                    setSolved(true);
-                }
-            }
-
-        } catch (error: any) {
-            console.log(error);
-            if (error.message.startsWith('AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:')) {
-                toast.error('Some tests failed! Please check your code and try again', toastConfig);
+            if (data.correct) {
+                toast.success("✅ Correct Answer!", toastConfig);
             } else {
-                toast.error('An error occurred while running your code', toastConfig);
+                toast.error("❌ Wrong Answer!", toastConfig);
             }
+        } catch (error) {
+            toast.error('An error occurred while running your code', toastConfig);
         }
     };
 
