@@ -4,6 +4,8 @@ import Split from 'react-split';
 import CodeMirror from '@uiw/react-codemirror';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { javascript } from '@codemirror/lang-javascript';
+import { python } from '@codemirror/lang-python';
+import { cpp } from '@codemirror/lang-cpp';
 import EditorFooter from './EditorFooter';
 import { Problem } from '@/utils/types/problem';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -24,20 +26,32 @@ export interface ISettings {
     fontSize: string;
     settingModalIsOpen: boolean;
     dropdownIsOpen: boolean;
+    language: 'javascript' | 'python' | 'cpp';
 };
 
 const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved }) => {
     let [userCode, setUserCode] = useState<string>(problem.starterCode);
+    const [language, setLanguage] = useState<'javascript' | 'python' | 'cpp'>('javascript');
     const [activeTestCaseId, setActiveTestCaseId] = useState<number>(0);
     const [fontSize, setFontSize] = useLocalStorage("lcc-fontSize", "16px");
     const [settings, setSettings] = useState<ISettings>({
         fontSize: fontSize,
         settingModalIsOpen: false,
         dropdownIsOpen: false,
+        language: 'javascript',
     });
     const [user] = useAuthState(auth);
     const { query: { pid } } = useRouter();
     const toastConfig: ToastOptions = { position: 'top-center', autoClose: 3000, theme: 'dark' };
+
+    const getLanguageExtension = () => {
+        switch (settings.language) {
+            case 'javascript': return javascript();
+            case 'python': return python();
+            case 'cpp': return cpp();
+            default: return javascript();
+        }
+    };
 
     const handleSubmit = async () => {
         if (!user) {
@@ -46,50 +60,40 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         }
 
         try {
-            userCode = userCode.slice(userCode.indexOf(problem.starterFunctionName));
-            const cb = new Function(`return ${userCode}`)();
-            const handler = problems[pid as string].handlerFunction;
+            const response = await fetch('/api/execute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: userCode,
+                    language: settings.language,
+                    expected_output: problem.examples[0].outputText
+                }),
+            });
 
-            if (typeof handler === 'function') {
-                const success = handler(cb);
+            const data = await response.json();
 
-                if (success) {
-                    toast.success('Congrats! All tests passed!', toastConfig);
-                    setSuccess(true);
-                    setTimeout(() => {
-                        setSuccess(false)
-                    }, 4000);
-
-                    const userRef = doc(fireStore, 'users', user.uid);
-                    await updateDoc(userRef, {
-                        solvedProblems: arrayUnion(pid)
-                    });
-                    setSolved(true);
-                }
-            }
-
-        } catch (error: any) {
-            console.log(error);
-            if (error.message.startsWith('AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:')) {
-                toast.error('Some tests failed! Please check your code and try again', toastConfig);
+            if (data.correct) {
+                toast.success("✅ Correct Answer!", toastConfig);
             } else {
-                toast.error('An error occurred while running your code', toastConfig);
+                toast.error("❌ Wrong Answer!", toastConfig);
             }
+        } catch (error) {
+            toast.error('An error occurred while running your code', toastConfig);
         }
     };
 
     useEffect(() => {
-        const code = localStorage.getItem(`code-${pid}`);
+        const code = localStorage.getItem(`code-${pid}-${settings.language}`);
         if (user) {
             setUserCode(code ? JSON.parse(code) : problem.starterCode);
         } else {
             setUserCode(problem.starterCode);
         }
-    }, [pid, user, problem.starterCode]);
+    }, [pid, user,  settings.language, problem.starterCode]);
 
     const onCHange = (value: string) => {
         setUserCode(value);
-        localStorage.setItem(`code-${pid}`, JSON.stringify(value));
+        localStorage.setItem(`code-${pid}-${settings.language}`, JSON.stringify(value));
     };
 
     return (
@@ -102,7 +106,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                         value={userCode}
                         theme={vscodeDark}
                         onChange={onCHange}
-                        extensions={[javascript()]}
+                        extensions={[getLanguageExtension()]}
                         style={{ fontSize: settings.fontSize }}
                     />
                 </div>
