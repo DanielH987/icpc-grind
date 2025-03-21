@@ -83,17 +83,17 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
     };
 
     useEffect(() => {
-        const code = localStorage.getItem(`code-${pid}`);
+        const code = localStorage.getItem(`code-${pid}-${settings.language}`);
         if (user) {
             setUserCode(code ? JSON.parse(code) : problem.starterCode);
         } else {
             setUserCode(problem.starterCode);
         }
-    }, [pid, user, problem.starterCode]);
+    }, [pid, user,  settings.language, problem.starterCode]);
 
     const onCHange = (value: string) => {
         setUserCode(value);
-        localStorage.setItem(`code-${pid}`, JSON.stringify(value));
+        localStorage.setItem(`code-${pid}-${settings.language}`, JSON.stringify(value));
     };
 
     return (
