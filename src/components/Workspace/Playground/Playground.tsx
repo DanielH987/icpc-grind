@@ -53,6 +53,35 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         }
     };
 
+    const handleRun = async () => {
+        if (!user) {
+            toast.error('Please login to run your code', toastConfig);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/runSecret', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: userCode,
+                    language: settings.language,
+                    problemId: problem.id
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.correct) {
+                toast.success("✅ Correct Answer!", toastConfig);
+            } else {
+                toast.error("❌ Wrong Answer!", toastConfig);
+            }
+        } catch (error) {
+            toast.error('An error occurred while running your code', toastConfig);
+        }
+    };
+
     const handleSubmit = async () => {
         if (!user) {
             toast.error('Please login to submit your code', toastConfig);
@@ -60,7 +89,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         }
 
         try {
-            const response = await fetch('/api/execute', {
+            const response = await fetch('/api/run', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -89,7 +118,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         } else {
             setUserCode(problem.starterCode);
         }
-    }, [pid, user,  settings.language, problem.starterCode]);
+    }, [pid, user, settings.language, problem.starterCode]);
 
     const onCHange = (value: string) => {
         setUserCode(value);
@@ -147,7 +176,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                 </div>
             </Split>
 
-            <EditorFooter handleSubmit={handleSubmit} />
+            <EditorFooter handleRun={handleRun} handleSubmit={handleSubmit} />
         </div>
     )
 }
