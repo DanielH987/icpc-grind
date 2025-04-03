@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-const JUDGE0_API_URL = 'https://judge0-ce.p.rapidapi.com/submissions';
-const RAPIDAPI_KEY = process.env.JUDGE0_API_KEY;
+const ICPC_BACKEND_URL = process.env.ICPC_BACKEND_URL;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -25,33 +24,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const delete_later = {
-      source_code: code,
-      language_id: languageMap[language],
-      stdin: '',
-      expected_output: expected_output,
-    }
-    const submissionResponse = await fetch(`${JUDGE0_API_URL}?base64_encoded=false&wait=true`, {
+    const submissionResponse = await fetch(`${ICPC_BACKEND_URL}/run`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
-        'X-RapidAPI-Key': RAPIDAPI_KEY!,
       },
-      body: JSON.stringify(delete_later),
+      body: JSON.stringify({
+        language: language === 'javascript' ? 'js' : language,
+        code,
+        input: '',
+      }),
     });
-
-    console.log(delete_later);
 
     const submissionResult = await submissionResponse.json();
-    console.log(submissionResult);
-
 
     return res.json({
-      output: submissionResult.stdout || submissionResult.stderr || 'Execution failed',
-      status: submissionResult.status.description
+      output: submissionResult || submissionResult.error || 'Execution failed'
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Execution failed' });
+    return res.status(500).json({ error: 'Execution failed', details: error });
   }
 }
