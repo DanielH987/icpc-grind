@@ -7,16 +7,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { code, language, expected_output } = req.body;
+  const { code, language, input } = req.body;
 
   if (!code || !language) {
     return res.status(400).json({ error: 'Missing code or language' });
   }
 
-  const languageMap: Record<string, number> = {
-    javascript: 63, // Node.js
-    python: 71, // Python 3
-    cpp: 54, // C++
+  const languageMap: Record<string, string> = {
+    js: 'js',
+    python: 'python',
+    cpp: 'cpp',
   };
 
   if (!languageMap[language]) {
@@ -30,9 +30,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        language: language === 'javascript' ? 'js' : language,
+        language: language,
         code,
-        input: '',
+        input,
       }),
     });
 
