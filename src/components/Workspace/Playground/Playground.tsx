@@ -89,7 +89,6 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         }
 
         try {
-            console.log(problem);
             const response = await fetch('/api/run', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
