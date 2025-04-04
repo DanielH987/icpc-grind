@@ -26,7 +26,7 @@ export interface ISettings {
     fontSize: string;
     settingModalIsOpen: boolean;
     dropdownIsOpen: boolean;
-    language: 'javascript' | 'python' | 'cpp';
+    language: 'js' | 'python' | 'cpp';
 };
 
 const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved }) => {
@@ -38,7 +38,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         fontSize: fontSize,
         settingModalIsOpen: false,
         dropdownIsOpen: false,
-        language: 'javascript',
+        language: 'js',
     });
     const [user] = useAuthState(auth);
     const { query: { pid } } = useRouter();
@@ -46,14 +46,14 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
     const getLanguageExtension = () => {
         switch (settings.language) {
-            case 'javascript': return javascript();
+            case 'js': return javascript();
             case 'python': return python();
             case 'cpp': return cpp();
             default: return javascript();
         }
     };
 
-    const handleRun = async () => {
+    const handleSubmit = async () => {
         if (!user) {
             toast.error('Please login to run your code', toastConfig);
             return;
@@ -82,20 +82,21 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         }
     };
 
-    const handleSubmit = async () => {
+    const handleRun = async () => {
         if (!user) {
             toast.error('Please login to submit your code', toastConfig);
             return;
         }
 
         try {
+            console.log(problem);
             const response = await fetch('/api/run', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     code: userCode,
                     language: settings.language,
-                    expected_output: problem.examples[0].outputText
+                    input: JSON.stringify(problem.tests)
                 }),
             });
 
