@@ -12,7 +12,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ settings, setSettings }
   const handleChange = (value: string) => {
     setSettings((prev) => ({
       ...prev,
-      language: value as 'javascript' | 'python' | 'cpp',
+      language: value as 'js' | 'python' | 'cpp',
     }));
   };
 
@@ -36,7 +36,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ settings, setSettings }
           className="bg-dark-layer-1 text-white rounded shadow-lg border border-dark-divider-border-2 z-50"
         >
           <Select.Viewport className="p-1 bg-dark-layer-1">
-            {['javascript', 'python', 'cpp'].map((lang) => (
+            {['js', 'python', 'cpp'].map((lang) => (
               <Select.Item
                 key={lang}
                 value={lang}
