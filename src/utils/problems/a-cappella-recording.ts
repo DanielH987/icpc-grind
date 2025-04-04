@@ -29,6 +29,13 @@ const starterCodeACappellaRecordingJS = `function minRecordings(n, d, pitches) {
 export const aCappellaRecording: Problem = {
     id: "a-cappella-recording",
     title: "11. A Cappella Recording",
+    tests:  [
+      [6, 0, [3, 1, 4, 1, 5, 9]],
+      [6, 1, [3, 1, 4, 1, 5, 9]],
+      [6, 2, [3, 1, 4, 1, 5, 9]],
+      [6, 4, [3, 1, 4, 1, 5, 9]],
+      [6, 8, [3, 1, 4, 1, 5, 9]],
+    ],
     problemStatement: `<p class='mt-3'>
     Geoffry is preparing an a cappella composition where he sings the entire song by himself.
   </p>
