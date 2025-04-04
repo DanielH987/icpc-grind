@@ -10,6 +10,7 @@ export type Example = {
 export type Problem = {
 	id: string;
 	title: string;
+	tests: Record<string, any>[];
 	problemStatement: string;
 	examples: Example[];
 	constraints: string;
