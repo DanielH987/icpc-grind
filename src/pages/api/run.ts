@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { code, language, input } = req.body;
+  const { code, language, input, answers } = req.body;
 
   if (!code || !language) {
     return res.status(400).json({ error: 'Missing code or language' });
@@ -33,6 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         language: language,
         code,
         input,
+        answers,
       }),
     });
 
