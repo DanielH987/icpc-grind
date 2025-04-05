@@ -1,4 +1,3 @@
-import assert from "assert";
 import { Problem } from "../types/problem";
 import { Language } from "../types/problem";
 
@@ -30,7 +29,7 @@ export const getStarterCode = (language: Language): string => {
 
 export const aCappellaRecording: Problem = {
     id: "a-cappella-recording",
-    title: "11. A Cappella Recording",
+    title: "2. A Cappella Recording",
     tests:  [
       [6, 0, [3, 1, 4, 1, 5, 9]],
       [6, 1, [3, 1, 4, 1, 5, 9]],
@@ -90,5 +89,5 @@ export const aCappellaRecording: Problem = {
     <li class='mt-2'><code>0 <= pitches[i] <= 10^9</code></li>`,
     starterCode: languageMap,
     starterFunctionName: "function minRecordings(",
-    order: 6,
+    order: 2,
 };
