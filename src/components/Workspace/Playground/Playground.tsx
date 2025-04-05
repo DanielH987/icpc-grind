@@ -30,7 +30,7 @@ export interface ISettings {
 };
 
 const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved }) => {
-    let [userCode, setUserCode] = useState<string>(problem.starterCode);
+    let [userCode, setUserCode] = useState<string>(problem.starterCode['js']);
     const [language, setLanguage] = useState<'javascript' | 'python' | 'cpp'>('javascript');
     const [activeTestCaseId, setActiveTestCaseId] = useState<number>(0);
     const [fontSize, setFontSize] = useLocalStorage("lcc-fontSize", "16px");
@@ -95,12 +95,13 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                 body: JSON.stringify({
                     code: userCode,
                     language: settings.language,
-                    input: JSON.stringify(problem.tests)
+                    input: JSON.stringify(problem.tests),
+                    answers: JSON.stringify(problem.answers),
                 }),
             });
 
             const data = await response.json();
-
+            console.log(JSON.stringify(problem.answers));
             if (data.correct) {
                 toast.success("✅ Correct Answer!", toastConfig);
             } else {
@@ -114,9 +115,9 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
     useEffect(() => {
         const code = localStorage.getItem(`code-${pid}-${settings.language}`);
         if (user) {
-            setUserCode(code ? JSON.parse(code) : problem.starterCode);
+            setUserCode(code ? JSON.parse(code) : problem.starterCode[settings.language]);
         } else {
-            setUserCode(problem.starterCode);
+            setUserCode(problem.starterCode[settings.language]);
         }
     }, [pid, user, settings.language, problem.starterCode]);
 
@@ -139,7 +140,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                         style={{ fontSize: settings.fontSize }}
                     />
                 </div>
-                <div className='w-full px-5 overflow-auto'>
+                <div className='w-full px-5 overflow-auto pb-[60px]'>
                     {/* testcase heading */}
                     <div className='flex h-10 items-center space-x-6'>
                         <div className='relative flex h-full flex-col justify-center cursor-pointer'>
