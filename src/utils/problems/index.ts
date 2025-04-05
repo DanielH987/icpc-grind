@@ -1,9 +1,5 @@
 import { Problem } from "../types/problem";
-import { jumpGame } from "./jump-game";
-import { reverseLinkedList } from "./reverse-linked-list";
-import { search2DMatrix } from "./search-a-2d-matrix";
-import { twoSum } from "./two-sum";
-import { validParentheses } from "./valid-parentheses";
+import {abcString} from "./abc-string";
 import { aCappellaRecording } from "./a-cappella-recording";
 
 interface ProblemMap {
@@ -11,10 +7,6 @@ interface ProblemMap {
 }
 
 export const problems: ProblemMap = {
-	"two-sum": twoSum,
-	"reverse-linked-list": reverseLinkedList,
-	"jump-game": jumpGame,
-	"search-a-2d-matrix": search2DMatrix,
-	"valid-parentheses": validParentheses,
+	"abc-string": abcString,
 	"a-cappella-recording": aCappellaRecording,
 };

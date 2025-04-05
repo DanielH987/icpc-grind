@@ -11,12 +11,12 @@ export type Problem = {
 	id: string;
 	title: string;
 	tests: Record<string, any>[];
+	answers: number[];
 	problemStatement: string;
 	examples: Example[];
 	constraints: string;
 	order: number;
-	starterCode: string;
-	handlerFunction: ((fn: any) => boolean) | string;
+	starterCode: Record<Language, string>;
 	starterFunctionName: string;
 };
 
@@ -31,3 +31,5 @@ export type DBProblem = {
 	videoId?: string;
 	link?: string;
 };
+
+export type Language = 'js' | 'python' | 'cpp';

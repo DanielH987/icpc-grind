@@ -41,7 +41,6 @@ export async function getStaticProps({ params }: { params: { pid: string } }) {
             notFound: true
         };
     }
-    problem.handlerFunction = problem.handlerFunction.toString();
     return {
         props: {
             problem
