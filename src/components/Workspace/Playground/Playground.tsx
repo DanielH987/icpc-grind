@@ -171,16 +171,22 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
                             return (
                                 <div
-                                    className='mr-2 items-start mt-2'
+                                    className="mr-2 items-start mt-2"
                                     key={example.id}
                                     onClick={() => setActiveTestCaseId(index)}
                                 >
-                                    <div className='flex flex-wrap items-center gap-y-4 relative'>
-                                        <div className={`${activeTestCaseId === index ? 'text-white' : 'text-gray-500'} font-medium items-center transition-all focus:outline-none inline-flex bg-dark-fill-3 hover:bg-dark-fill-2 relative rounded-lg px-4 py-1 cursor-pointer whitespace-nowrap`}>
+                                    <div className="flex flex-wrap items-center gap-y-4 relative">
+                                        <div
+                                            className={`${activeTestCaseId === index ? 'text-white' : 'text-gray-500'
+                                                } font-medium items-center transition-all focus:outline-none inline-flex bg-dark-fill-3 hover:bg-dark-fill-2 relative rounded-lg px-4 py-1 cursor-pointer whitespace-nowrap`}
+                                        >
                                             case {index + 1}
                                         </div>
                                         {typeof passed === 'boolean' && (
-                                            <div className={`absolute -top-1 -right-1 h-2 w-2 rounded-full ${passed ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                            <div
+                                                className={`absolute -top-1 -right-1 h-2 w-2 rounded-full ${passed ? 'bg-green-500' : 'bg-red-500'
+                                                    }`}
+                                            ></div>
                                         )}
                                     </div>
                                 </div>
@@ -188,9 +194,9 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                         })}
                     </div>
 
-                    <div className='font-semibold'>
-                        <p className='text-sm font-medium mt-4 text-white'>Input:</p>
-                        <div className='w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2'>
+                    <div className="font-semibold">
+                        <p className="text-sm font-medium mt-4 text-white">Input:</p>
+                        <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2">
                             {problem.examples[activeTestCaseId].inputText}
                         </div>
 
@@ -198,23 +204,30 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                             <>
                                 {testResults[activeTestCaseId].result.stdout && (
                                     <>
-                                        <p className='text-sm font-medium mt-4 text-white'>Stdout:</p>
-                                        <div className='w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2'>
+                                        <p className="text-sm font-medium mt-4 text-white">Stdout:</p>
+                                        <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2">
                                             {testResults[activeTestCaseId].result.stdout}
                                         </div>
                                     </>
                                 )}
 
-                                <p className='text-sm font-medium mt-4 text-white'>Output:</p>
-                                <div className='w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2'>
+                                <p className="text-sm font-medium mt-4 text-white">Output:</p>
+                                <div
+                                    className={`w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent ${testResults[activeTestCaseId].passed ? 'text-white' : 'text-red-500'
+                                        } mt-2`}
+                                >
                                     {String(testResults[activeTestCaseId].result.output)}
                                 </div>
-
                             </>
                         )}
 
-                        <p className='text-sm font-medium mt-4 text-white'>Expected Output:</p>
-                        <div className='w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2'>
+                        <p className="text-sm font-medium mt-4 text-white">Expected Output:</p>
+                        <div
+                            className={`w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent ${testResults[activeTestCaseId]?.passed === false
+                                    ? 'text-green-500'
+                                    : 'text-white'
+                                } mt-2`}
+                        >
                             {problem.examples[activeTestCaseId].outputText}
                         </div>
                     </div>
