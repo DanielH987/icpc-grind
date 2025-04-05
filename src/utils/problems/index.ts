@@ -1,4 +1,5 @@
 import { Problem } from "../types/problem";
+import {abcString} from "./abc-string";
 import { aCappellaRecording } from "./a-cappella-recording";
 
 interface ProblemMap {
@@ -6,5 +7,6 @@ interface ProblemMap {
 }
 
 export const problems: ProblemMap = {
+	"abc-string": abcString,
 	"a-cappella-recording": aCappellaRecording,
 };
