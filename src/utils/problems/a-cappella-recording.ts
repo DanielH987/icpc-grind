@@ -1,30 +1,32 @@
 import assert from "assert";
 import { Problem } from "../types/problem";
-
-export const aCappellaRecordingHandler = (fn: any) => {
-	try {
-		const tests = [
-			{ n: 6, d: 0, pitches: [3, 1, 4, 1, 5, 9] },
-			{ n: 6, d: 1, pitches: [3, 1, 4, 1, 5, 9] },
-			{ n: 6, d: 2, pitches: [3, 1, 4, 1, 5, 9] },
-			{ n: 6, d: 4, pitches: [3, 1, 4, 1, 5, 9] },
-			{ n: 6, d: 8, pitches: [3, 1, 4, 1, 5, 9] },
-		];
-		const answers = [5, 4, 3, 2, 1];
-		for (let i = 0; i < tests.length; i++) {
-			const result = fn(tests[i].n, tests[i].d, tests[i].pitches);
-			assert.equal(result, answers[i]);
-		}
-		return true;
-	} catch (error: any) {
-		console.error("Error from aCappellaRecordingHandler: ", error);
-		throw new Error(error);
-	}
-};
+import { Language } from "../types/problem";
 
 const starterCodeACappellaRecordingJS = `function minRecordings(n, d, pitches) {
   // Write your code here
 };`;
+
+const starterCodeACappellaRecordingPython = `def min_recordings(n, d, pitches):
+    # Write your code here
+    pass`;
+
+const starterCodeACappellaRecordingCPP = `#include <vector>
+using namespace std;
+
+int minRecordings(int n, int d, vector<int>& pitches) {
+    // Write your code here
+    return 0;
+}`;
+
+const languageMap: Record<Language, string> = {
+  js: starterCodeACappellaRecordingJS,
+  python: starterCodeACappellaRecordingPython,
+  cpp: starterCodeACappellaRecordingCPP,
+};
+
+export const getStarterCode = (language: Language): string => {
+  return languageMap[language];
+};
 
 export const aCappellaRecording: Problem = {
     id: "a-cappella-recording",
@@ -36,6 +38,7 @@ export const aCappellaRecording: Problem = {
       [6, 4, [3, 1, 4, 1, 5, 9]],
       [6, 8, [3, 1, 4, 1, 5, 9]],
     ],
+    answers: [5, 4, 3, 2, 1],
     problemStatement: `<p class='mt-3'>
     Geoffry is preparing an a cappella composition where he sings the entire song by himself.
   </p>
@@ -85,8 +88,7 @@ export const aCappellaRecording: Problem = {
     constraints: `<li class='mt-2'><code>1 <= n <= 10^5</code></li>
     <li class='mt-2'><code>0 <= d <= 10^9</code></li>
     <li class='mt-2'><code>0 <= pitches[i] <= 10^9</code></li>`,
-    starterCode: starterCodeACappellaRecordingJS,
-    handlerFunction: aCappellaRecordingHandler,
+    starterCode: languageMap,
     starterFunctionName: "function minRecordings(",
     order: 6,
 };
