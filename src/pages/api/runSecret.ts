@@ -44,12 +44,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(response.status).json({ error: data.error || 'Execution failed' });
     }
 
-    return res.status(200).json({
-      problemId: data.problemId,
-      totalCount: data.totalCount,
-      passedCount: data.passedCount,
-      message: data.message,
-      results: data.results,
+    return res.json({
+      output: data || data.error || 'Execution failed'
     });
   } catch (error) {
     return res.status(500).json({ error: 'Execution failed', details: error });

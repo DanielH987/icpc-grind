@@ -13,8 +13,7 @@ import { auth, fireStore } from '@/firebase/firebase';
 import { toast, ToastOptions } from 'react-toastify';
 import { useRouter } from 'next/router';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import CircleSkeleton from '@/components/Skeletons/CircleSkeleton';
-import RectangleSkeleton from '@/components/Skeletons/RectangleSkeleton';
+import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
 
 type PlaygroundProps = {
     problem: Problem;
@@ -46,6 +45,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
     const [testResults, setTestResults] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [runError, setRunError] = useState<any>(null);
+    const [casesPassed, setCasesPassed] = useState<any>(null);
 
     const getLanguageExtension = () => {
         switch (settings.language) {
@@ -63,6 +63,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         }
 
         setIsLoading(true);
+        setRunError(null);
+
         try {
             const response = await fetch('/api/runSecret', {
                 method: 'POST',
@@ -76,10 +78,23 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
             const data = await response.json();
 
-            if (data.correct) {
-                toast.success("✅ Correct Answer!", toastConfig);
+            if (data.output?.passed) {
+                toast.success("Correct Answer!", toastConfig);
+                setSuccess(true);
+                setTimeout(() => {
+                    setSuccess(false);
+                }, 4000);
+                const userRef = doc(fireStore, "users", user.uid);
+                await updateDoc(userRef, {
+                    solvedProblems: arrayUnion(pid),
+                });
+                setSolved(true);
+                setCasesPassed(data.output.message);
+            } else if (data.output?.error) {
+                setRunError(data.output.error);
             } else {
-                toast.error("❌ Wrong Answer!", toastConfig);
+                toast.error("Wrong Answer!", toastConfig);
+                setCasesPassed(data.output.message);
             }
         } catch (error) {
             toast.error('An error occurred while running your code', toastConfig);
@@ -136,6 +151,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
     useEffect(() => {
         setTestResults([]);
+        setRunError(null);
+        setCasesPassed(null);
     }, [settings.language, pid]);
 
     const onCHange = (value: string) => {
@@ -164,6 +181,11 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                             <div className='text-sm font-medium leading-5 text-white'>Testcases</div>
                             <hr className='absolute bottom-0 h-0.5 w-full rounded-full border-none bg-white' />
                         </div>
+                        {casesPassed && (
+                            <div className='text-sm font-medium leading-5 text-gray-400'>
+                                {casesPassed}
+                            </div>
+                        )}
                     </div>
 
                     {runError && (
