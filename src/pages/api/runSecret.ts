@@ -48,6 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       problemId: data.problemId,
       totalCount: data.totalCount,
       passedCount: data.passedCount,
+      passed: data.passed,
       message: data.message,
       results: data.results,
     });
