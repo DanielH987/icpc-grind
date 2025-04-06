@@ -28,6 +28,8 @@ module.exports = {
 				olive: "rgb(0, 184, 163)",
 				"dark-green-s": "rgb(44 187 93)",
 				"dark-blue-s": "rgb(10 132 255)",
+				blush: 'rgb(55, 42, 43)',
+				"blush-text": 'rgb(246, 54, 54)',
 			},
 		},
 	},

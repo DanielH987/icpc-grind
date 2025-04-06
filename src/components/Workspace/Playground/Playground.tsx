@@ -11,10 +11,10 @@ import { Problem } from '@/utils/types/problem';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, fireStore } from '@/firebase/firebase';
 import { toast, ToastOptions } from 'react-toastify';
-import { problems } from '@/utils/problems';
 import { useRouter } from 'next/router';
-import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import CircleSkeleton from '@/components/Skeletons/CircleSkeleton';
+import RectangleSkeleton from '@/components/Skeletons/RectangleSkeleton';
 
 type PlaygroundProps = {
     problem: Problem;
@@ -43,6 +43,9 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
     const [user] = useAuthState(auth);
     const { query: { pid } } = useRouter();
     const toastConfig: ToastOptions = { position: 'top-center', autoClose: 3000, theme: 'dark' };
+    const [testResults, setTestResults] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [runError, setRunError] = useState<any>(null);
 
     const getLanguageExtension = () => {
         switch (settings.language) {
@@ -59,6 +62,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             return;
         }
 
+        setIsLoading(true);
         try {
             const response = await fetch('/api/runSecret', {
                 method: 'POST',
@@ -79,6 +83,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             }
         } catch (error) {
             toast.error('An error occurred while running your code', toastConfig);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -87,6 +93,9 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             toast.error('Please login to submit your code', toastConfig);
             return;
         }
+
+        setIsLoading(true);
+        setRunError(null);
 
         try {
             const response = await fetch('/api/run', {
@@ -101,14 +110,18 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             });
 
             const data = await response.json();
-            console.log(JSON.stringify(problem.answers));
-            if (data.correct) {
-                toast.success("✅ Correct Answer!", toastConfig);
-            } else {
-                toast.error("❌ Wrong Answer!", toastConfig);
+
+            if (data.output?.results) {
+                setTestResults(data.output.results);
+            } else if (data.output?.error) {
+                setRunError(data.output.error);
+                setTestResults([]);
             }
+
         } catch (error) {
             toast.error('An error occurred while running your code', toastConfig);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -120,6 +133,10 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             setUserCode(problem.starterCode[settings.language]);
         }
     }, [pid, user, settings.language, problem.starterCode]);
+
+    useEffect(() => {
+        setTestResults([]);
+    }, [settings.language, pid]);
 
     const onCHange = (value: string) => {
         setUserCode(value);
@@ -149,35 +166,94 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                         </div>
                     </div>
 
+                    {runError && (
+                        <div className="text-blush-text mt-4 mb-4">
+                            <p className="font-semibold">{runError.type}:</p>
+                            <div className='bg-blush rounded-lg p-4 mt-4'>
+                                <pre className="whitespace-pre-wrap text-sm mt-1">{runError.message}</pre>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex">
-                        {problem.examples.map((example, index) => (
-                            <div className='mr-2 items-start mt-2' key={example.id}
-                                onClick={() => setActiveTestCaseId(index)}
-                            >
-                                <div className='flex flex-wrap items-center gap-y-4'>
-                                    <div className={`${activeTestCaseId === index ? 'text-white' : 'text-gray-500'} font-medium items-center transition-all focus:outline-none inline-flex bg-dark-fill-3 hover:bg-dark-fill-2 relative rounded-lg px-4 py-1 cursor-pointer whitespace-nowrap`}>
-                                        case {index + 1}
+                        {problem.examples.map((example, index) => {
+                            const result = testResults[index];
+                            const passed = result?.passed;
+
+                            return (
+                                <div
+                                    className="mr-2 items-start mt-2"
+                                    key={example.id}
+                                    onClick={() => setActiveTestCaseId(index)}
+                                >
+                                    <div className="flex flex-wrap items-center gap-y-4 relative">
+                                        <div
+                                            className={`${activeTestCaseId === index ? 'text-white' : 'text-gray-500'
+                                                } font-medium items-center transition-all focus:outline-none inline-flex bg-dark-fill-3 hover:bg-dark-fill-2 relative rounded-lg px-4 py-1 cursor-pointer whitespace-nowrap`}
+                                        >
+                                            case {index + 1}
+                                        </div>
+                                        {typeof passed === 'boolean' && (
+                                            <div
+                                                className={`absolute -top-1 -right-1 h-2 w-2 rounded-full ${passed ? 'bg-green-500' : 'bg-red-500'
+                                                    }`}
+                                            ></div>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
-                    <div className='font-semibold'>
-                        <p className='text-sm font-medium mt-4 text-white'>Input:</p>
-                        <div className='w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2'>
-                            {problem.examples[activeTestCaseId].inputText}
-                        </div>
+                    <div className="font-semibold">
+                        <p className="text-sm font-medium mt-4 text-white">Input:</p>
+                        {isLoading ? (
+                            <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2 animate-pulse"></div>
+                        ) : (
+                            <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2">
+                                {problem.examples[activeTestCaseId].inputText}
+                            </div>
+                        )}
 
-                        <p className='text-sm font-medium mt-4 text-white'>Output:</p>
-                        <div className='w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2'>
-                            {problem.examples[activeTestCaseId].outputText}
-                        </div>
+                        {testResults[activeTestCaseId] && (
+                            <>
+                                {testResults[activeTestCaseId].result.stdout && (
+                                    <>
+                                        <p className="text-sm font-medium mt-4 text-white">Stdout:</p>
+                                        <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2">
+                                            {testResults[activeTestCaseId].result.stdout}
+                                        </div>
+                                    </>
+                                )}
+
+                                <p className="text-sm font-medium mt-4 text-white">Output:</p>
+                                <div
+                                    className={`w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent ${testResults[activeTestCaseId].passed ? 'text-white' : 'text-red-500'
+                                        } mt-2`}
+                                >
+                                    {String(testResults[activeTestCaseId].result.output)}
+                                </div>
+                            </>
+                        )}
+
+                        <p className="text-sm font-medium mt-4 text-white">Expected Output:</p>
+                        {isLoading ? (
+                            <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2 animate-pulse"></div>
+                        ) : (
+                            <div
+                                className={`w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent ${testResults[activeTestCaseId]?.passed === false
+                                    ? 'text-green-500'
+                                    : 'text-white'
+                                    } mt-2`}
+                            >
+                                {problem.examples[activeTestCaseId].outputText}
+                            </div>
+                        )}
                     </div>
                 </div>
             </Split>
 
-            <EditorFooter handleRun={handleRun} handleSubmit={handleSubmit} />
+            <EditorFooter handleRun={handleRun} handleSubmit={handleSubmit} isLoading={isLoading} />
         </div>
     )
 }
