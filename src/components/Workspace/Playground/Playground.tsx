@@ -11,10 +11,10 @@ import { Problem } from '@/utils/types/problem';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, fireStore } from '@/firebase/firebase';
 import { toast, ToastOptions } from 'react-toastify';
-import { problems } from '@/utils/problems';
 import { useRouter } from 'next/router';
-import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import CircleSkeleton from '@/components/Skeletons/CircleSkeleton';
+import RectangleSkeleton from '@/components/Skeletons/RectangleSkeleton';
 
 type PlaygroundProps = {
     problem: Problem;
@@ -44,6 +44,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
     const { query: { pid } } = useRouter();
     const toastConfig: ToastOptions = { position: 'top-center', autoClose: 3000, theme: 'dark' };
     const [testResults, setTestResults] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [runError, setRunError] = useState<any>(null);
 
     const getLanguageExtension = () => {
         switch (settings.language) {
@@ -60,6 +62,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             return;
         }
 
+        setIsLoading(true);
         try {
             const response = await fetch('/api/runSecret', {
                 method: 'POST',
@@ -80,6 +83,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             }
         } catch (error) {
             toast.error('An error occurred while running your code', toastConfig);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -88,6 +93,9 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             toast.error('Please login to submit your code', toastConfig);
             return;
         }
+
+        setIsLoading(true);
+        setRunError(null);
 
         try {
             const response = await fetch('/api/run', {
@@ -104,22 +112,16 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             const data = await response.json();
 
             if (data.output?.results) {
-                const results = data.output.results;
-                setTestResults(results);
-
-                const allPassed = results.every((test: any) => test.passed);
-
-                if (allPassed) {
-                    toast.success("✅ Correct Answer!", toastConfig);
-                } else {
-                    toast.error("❌ Wrong Answer!", toastConfig);
-                }
-            } else {
-                toast.error("❌ Something went wrong with the test results", toastConfig);
+                setTestResults(data.output.results);
+            } else if (data.output?.error) {
+                setRunError(data.output.error);
+                setTestResults([]);
             }
 
         } catch (error) {
             toast.error('An error occurred while running your code', toastConfig);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -164,6 +166,15 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                         </div>
                     </div>
 
+                    {runError && (
+                        <div className="text-blush-text mt-4 mb-4">
+                            <p className="font-semibold">{runError.type}:</p>
+                            <div className='bg-blush rounded-lg p-4 mt-4'>
+                                <pre className="whitespace-pre-wrap text-sm mt-1">{runError.message}</pre>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex">
                         {problem.examples.map((example, index) => {
                             const result = testResults[index];
@@ -196,9 +207,13 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
                     <div className="font-semibold">
                         <p className="text-sm font-medium mt-4 text-white">Input:</p>
-                        <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2">
-                            {problem.examples[activeTestCaseId].inputText}
-                        </div>
+                        {isLoading ? (
+                            <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2 animate-pulse"></div>
+                        ) : (
+                            <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2">
+                                {problem.examples[activeTestCaseId].inputText}
+                            </div>
+                        )}
 
                         {testResults[activeTestCaseId] && (
                             <>
@@ -222,19 +237,23 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                         )}
 
                         <p className="text-sm font-medium mt-4 text-white">Expected Output:</p>
-                        <div
-                            className={`w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent ${testResults[activeTestCaseId]?.passed === false
+                        {isLoading ? (
+                            <div className="w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent text-white mt-2 animate-pulse"></div>
+                        ) : (
+                            <div
+                                className={`w-full cursor-text rounded-lg border px-3 py-[10px] bg-dark-fill-3 border-transparent ${testResults[activeTestCaseId]?.passed === false
                                     ? 'text-green-500'
                                     : 'text-white'
-                                } mt-2`}
-                        >
-                            {problem.examples[activeTestCaseId].outputText}
-                        </div>
+                                    } mt-2`}
+                            >
+                                {problem.examples[activeTestCaseId].outputText}
+                            </div>
+                        )}
                     </div>
                 </div>
             </Split>
 
-            <EditorFooter handleRun={handleRun} handleSubmit={handleSubmit} />
+            <EditorFooter handleRun={handleRun} handleSubmit={handleSubmit} isLoading={isLoading} />
         </div>
     )
 }
