@@ -1,11 +1,15 @@
 import { Problem } from "../types/problem";
 import { Language } from "../types/problem";
 
-const starterCodeABCStringJS = `function minBeautifulSubsequences(s) {
+const starterCodeABCStringJS = `/**
+ * @param {string} s - A string consisting of equal counts of A, B, and C
+ * @returns {number} - Minimum number of beautiful subsequences
+ */
+function minBeautifulSubsequences(s) {
   // Write your code here
 };`;
 
-const starterCodeABCStringPython = `def min_beautiful_subsequences(s):
+const starterCodeABCStringPython = `def min_beautiful_subsequences(s: str) -> int:
     # Write your code here
     pass`;
 
