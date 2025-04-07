@@ -237,7 +237,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                             </div>
                         )}
 
-                        {testResults[activeTestCaseId] && (
+                        {testResults[activeTestCaseId] && !isLoading && (
                             <>
                                 {testResults[activeTestCaseId].result.stdout && (
                                     <>
