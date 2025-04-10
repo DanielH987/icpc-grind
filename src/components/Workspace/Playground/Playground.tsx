@@ -25,12 +25,12 @@ export interface ISettings {
     fontSize: string;
     settingModalIsOpen: boolean;
     dropdownIsOpen: boolean;
-    language: 'js' | 'python' | 'cpp';
+    language: 'javaScript' | 'python' | 'cpp';
 };
 
 const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved }) => {
-    let [userCode, setUserCode] = useState<string>(problem.starterCode['js']);
-    const [storedLanguage, setStoredLanguage] = useLocalStorage("lcc-language", "js");
+    let [userCode, setUserCode] = useState<string>(problem.starterCode['javaScript']);
+    const [storedLanguage, setStoredLanguage] = useLocalStorage("lcc-language", "javaScript");
     const [activeTestCaseId, setActiveTestCaseId] = useState<number>(0);
     const [fontSize, setFontSize] = useLocalStorage("lcc-fontSize", "16px");
     const [settings, setSettings] = useState<ISettings>({
@@ -49,7 +49,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
     const getLanguageExtension = () => {
         switch (settings.language) {
-            case 'js': return javascript();
+            case 'javaScript': return javascript();
             case 'python': return python();
             case 'cpp': return cpp();
             default: return javascript();

@@ -22,7 +22,7 @@ int minBeautifulSubsequences(string s) {
 }`;
 
 const languageMap: Record<Language, string> = {
-  js: starterCodeABCStringJS,
+  javaScript: starterCodeABCStringJS,
   python: starterCodeABCStringPython,
   cpp: starterCodeABCStringCPP,
 };
