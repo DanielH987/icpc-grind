@@ -24,7 +24,7 @@ int minRecordings(int n, int d, vector<int>& pitches) {
 }`;
 
 const languageMap: Record<Language, string> = {
-  js: starterCodeACappellaRecordingJS,
+  javaScript: starterCodeACappellaRecordingJS,
   python: starterCodeACappellaRecordingPython,
   cpp: starterCodeACappellaRecordingCPP,
 };

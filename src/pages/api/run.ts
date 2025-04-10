@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const languageMap: Record<string, string> = {
-    js: 'js',
+    javaScript: 'js',
     python: 'python',
     cpp: 'cpp',
   };
