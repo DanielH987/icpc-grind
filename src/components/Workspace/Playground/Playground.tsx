@@ -64,6 +64,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
         setIsLoading(true);
         setRunError(null);
+        setTestResults([]);
+        setCasesPassed(null);
 
         try {
             const response = await fetch('/api/runSecret', {
@@ -111,6 +113,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
         setIsLoading(true);
         setRunError(null);
+        setTestResults([]);
+        setCasesPassed(null);
 
         try {
             const response = await fetch('/api/run', {
@@ -237,7 +241,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                             </div>
                         )}
 
-                        {testResults[activeTestCaseId] && (
+                        {testResults[activeTestCaseId] && !isLoading && (
                             <>
                                 {testResults[activeTestCaseId].result.stdout && (
                                     <>

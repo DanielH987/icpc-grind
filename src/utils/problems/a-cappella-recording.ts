@@ -1,11 +1,17 @@
 import { Problem } from "../types/problem";
 import { Language } from "../types/problem";
 
-const starterCodeACappellaRecordingJS = `function minRecordings(n, d, pitches) {
+const starterCodeACappellaRecordingJS = `/**
+ * @param {number} n - Number of notes
+ * @param {number} d - Maximum allowed pitch difference in one recording
+ * @param {number[]} pitches - Array of note pitches
+ * @returns {number} - Minimum number of recordings
+ */
+function minRecordings(n, d, pitches) {
   // Write your code here
 };`;
 
-const starterCodeACappellaRecordingPython = `def min_recordings(n, d, pitches):
+const starterCodeACappellaRecordingPython = `def min_recordings(n: int, d: int, pitches: list[int]) -> int:
     # Write your code here
     pass`;
 
