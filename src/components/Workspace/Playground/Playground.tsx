@@ -145,7 +145,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
     };
 
     useEffect(() => {
-        const code = localStorage.getItem(`code-${pid}-${settings.language}`);
+        const code = localStorage.getItem(`code-${user?.uid || 'guest'}-${pid}-${settings.language}`);
         if (user) {
             setUserCode(code ? JSON.parse(code) : problem.starterCode[settings.language]);
         } else {
@@ -165,7 +165,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
     const onCHange = (value: string) => {
         setUserCode(value);
-        localStorage.setItem(`code-${pid}-${settings.language}`, JSON.stringify(value));
+        localStorage.setItem(`code-${user?.uid || 'guest'}-${pid}-${settings.language}`, JSON.stringify(value));
     };
 
     return (
