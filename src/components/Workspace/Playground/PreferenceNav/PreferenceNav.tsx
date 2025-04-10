@@ -59,7 +59,7 @@ const PreferenceNav: React.FC<PreferenceNavProps> = ({ settings, setSettings, se
                 <div className='h-4 w-4 text-dark-gray-6 font-bold text-lg'>
                     <RiResetLeftLine />
                 </div>
-                <div className='preferenceBtn-tooltip'>Reset to Starter Code</div>
+                <div className='preferenceBtn-tooltip'>Restore Default Code</div>
             </button>
 
             <button className='preferenceBtn group' onClick={() => setSettings({ ...settings, settingModalIsOpen: true })}>

@@ -30,14 +30,14 @@ export interface ISettings {
 
 const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved }) => {
     let [userCode, setUserCode] = useState<string>(problem.starterCode['js']);
-    const [language, setLanguage] = useState<'javascript' | 'python' | 'cpp'>('javascript');
+    const [storedLanguage, setStoredLanguage] = useLocalStorage("lcc-language", "js");
     const [activeTestCaseId, setActiveTestCaseId] = useState<number>(0);
     const [fontSize, setFontSize] = useLocalStorage("lcc-fontSize", "16px");
     const [settings, setSettings] = useState<ISettings>({
         fontSize: fontSize,
         settingModalIsOpen: false,
         dropdownIsOpen: false,
-        language: 'js',
+        language: storedLanguage,
     });
     const [user] = useAuthState(auth);
     const { query: { pid } } = useRouter();
@@ -158,6 +158,10 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         setRunError(null);
         setCasesPassed(null);
     }, [settings.language, pid]);
+
+    useEffect(() => {
+        setStoredLanguage(settings.language);
+    }, [setStoredLanguage, settings.language]);
 
     const onCHange = (value: string) => {
         setUserCode(value);
