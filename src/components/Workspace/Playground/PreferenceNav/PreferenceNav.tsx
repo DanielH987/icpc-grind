@@ -5,6 +5,8 @@ import { ISettings } from '../Playground';
 import SettingsModal from '@/components/Modals/SettingsModals';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import { Problem } from '@/utils/types/problem';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/firebase/firebase';
 
 type PreferenceNavProps = {
     settings: ISettings;
@@ -24,6 +26,7 @@ const PreferenceNav: React.FC<PreferenceNavProps> = ({ settings, setSettings, se
 
         setIsFullScreen(!isFullScreen);
     };
+    const [user] = useAuthState(auth);
 
     useEffect(() => {
         function exitHandler(e: any) {
@@ -53,7 +56,7 @@ const PreferenceNav: React.FC<PreferenceNavProps> = ({ settings, setSettings, se
                 onClick={() => {
                     const defaultCode = problem.starterCode[settings.language];
                     setUserCode(defaultCode);
-                    localStorage.setItem(`code-${problem.id}-${settings.language}`, JSON.stringify(defaultCode));
+                    localStorage.setItem(`code-${user?.uid || 'guest'}-${problem.id}-${settings.language}`, JSON.stringify(defaultCode));
                 }}
             >
                 <div className='h-4 w-4 text-dark-gray-6 font-bold text-lg'>
