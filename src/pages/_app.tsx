@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import { RecoilRoot } from "recoil";
 import { ToastContainer } from "react-toastify";
+import { Analytics } from "@vercel/analytics/react";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -16,6 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <ToastContainer />
       <Component {...pageProps} />
+      <Analytics />
     </RecoilRoot>
   );
 }
