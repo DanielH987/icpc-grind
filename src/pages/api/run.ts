@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        language: language,
+        language,
         code,
         input,
         answers,

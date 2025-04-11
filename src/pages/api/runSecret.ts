@@ -25,6 +25,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Unsupported language' });
   }
 
+  let sanitizedCode = code;
+
+  if (language === 'python') {
+    // Remove print(...) statements
+    sanitizedCode = code.replace(/^\s*print\(.*?\)\s*$/gm, '');
+  } else if (language === 'javaScript') {
+    // Remove console.log(...) statements
+    sanitizedCode = code.replace(/^\s*console\.log\(.*?\)\s*;?\s*$/gm, '');
+  } else if (language === 'cpp') {
+    // Remove std::cout << ...; and printf(...) statements
+    sanitizedCode = code
+      .replace(/^\s*std::cout\s*<<.*?;\s*$/gm, '')
+      .replace(/^\s*printf\(.*?\);\s*$/gm, '');
+  }
+
+
   try {
     const response = await fetch(`${ICPC_BACKEND_URL}/runSecret`, {
       method: 'POST',
@@ -32,8 +48,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        code,
-        language: language,
+        code: sanitizedCode,
+        language,
         problemId,
       }),
     });
