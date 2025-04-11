@@ -58,7 +58,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
     const handleSubmit = async () => {
         if (!user) {
-            toast.error('Please login to run your code', toastConfig);
+            toast.error('Please login to submit your code', toastConfig);
             return;
         }
 
@@ -107,7 +107,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
 
     const handleRun = async () => {
         if (!user) {
-            toast.error('Please login to submit your code', toastConfig);
+            toast.error('Please login to run your code', toastConfig);
             return;
         }
 
