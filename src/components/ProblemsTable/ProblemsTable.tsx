@@ -66,15 +66,7 @@ const ProblemsTable: React.FC<ProblemsTableProps> = ({ setLoadingProblems }) => 
                                 {problem.category}
                             </td>
                             <td className={`px-6 py-4`}>
-                                {problem.videoId ? (
-                                    <AiFillYoutube
-                                        fontSize={"18"}
-                                        className='cursor-pointer hover:text-red-500'
-                                        onClick={() => setYoutubePlayer({ videoId: problem.videoId as string, isOpen: true })}
-                                    />
-                                ) : (
-                                    <p className='text-gray-400'>Coming soon</p>
-                                )}
+                                {problem.year}
                             </td>
                         </tr>
                     )
