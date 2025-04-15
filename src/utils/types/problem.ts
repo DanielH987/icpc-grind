@@ -11,7 +11,7 @@ export type Problem = {
 	id: string;
 	title: string;
 	tests: Record<string, any>[];
-	answers: number[];
+	answers: any[];
 	problemStatement: string;
 	examples: Example[];
 	constraints: string;

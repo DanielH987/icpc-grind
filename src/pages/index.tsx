@@ -16,6 +16,7 @@ export default function Home() {
   //   link: "",
   //   likes: 0,
   //   dislikes: 0,
+  //   year: 0,
   // });
 
   // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +32,7 @@ export default function Home() {
   //   const newProblem = {
   //     ...inputs,
   //     order: Number(inputs.order),
+  //     year: Number(inputs.year),
   //   }
   //   await setDoc(doc(fireStore, "problems", inputs.id), newProblem);
   //   alert("Problem added to DB");
@@ -73,6 +75,7 @@ export default function Home() {
           <input type="text" onChange={handleInputChange} placeholder="category" name="category" />
           <input type="text" onChange={handleInputChange} placeholder="order" name="order" />
           <input type="text" onChange={handleInputChange} placeholder="videoId?" name="videoId" />
+          <input type="text" onChange={handleInputChange} placeholder="year" name="year" />
           <input type="text" onChange={handleInputChange} placeholder="link?" name="link" />
           <button className="bg-white">Save to DB</button>
         </form> */}
@@ -87,6 +90,7 @@ const LoadingSkeleton = () => {
       <div className='w-6 h-6 shrink-0 rounded-full bg-dark-layer-1'></div>
       <div className='h-4 sm:w-52  w-32  rounded-full bg-dark-layer-1'></div>
       <div className='h-4 sm:w-52  w-32 rounded-full bg-dark-layer-1'></div>
+      <div className='h-4 sm:w-52 w-32 rounded-full bg-dark-layer-1'></div>
       <div className='h-4 sm:w-52 w-32 rounded-full bg-dark-layer-1'></div>
       <span className='sr-only'>Loading...</span>
     </div>
