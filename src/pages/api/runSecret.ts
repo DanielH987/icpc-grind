@@ -17,6 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     javaScript: 'js',
     python: 'python',
     cpp: 'cpp',
+    java: 'java',
   };
 
   const backendLanguage = languageMap[language];
