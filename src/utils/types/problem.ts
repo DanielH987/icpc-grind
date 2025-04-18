@@ -33,4 +33,4 @@ export type DBProblem = {
 	link?: string;
 };
 
-export type Language = 'javaScript' | 'python' | 'cpp';
+export type Language = 'javaScript' | 'python' | 'cpp' | 'java';
