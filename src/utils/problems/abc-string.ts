@@ -21,10 +21,18 @@ int minBeautifulSubsequences(string s) {
     return 0;
 }`;
 
+const starterCodeABCStringJava = `public class Solution {
+  public static int minBeautifulSubsequences(String s) {
+      // Write your code here
+      return 0;
+  }
+}`;
+
 const languageMap: Record<Language, string> = {
   javaScript: starterCodeABCStringJS,
   python: starterCodeABCStringPython,
   cpp: starterCodeABCStringCPP,
+  java: starterCodeABCStringJava,
 };
 
 export const getStarterCode = (language: Language): string => {
