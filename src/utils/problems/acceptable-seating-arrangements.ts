@@ -25,10 +25,18 @@ vector<vector<int>> acceptableSeatingArrangements(vector<vector<int>>& original,
 }
 `;
 
+const starterCodeAcceptableSeatingJava = `public class Solution {
+    public static List<List<Integer>> acceptableSeatingArrangements(int[][] original, int[][] target) {
+        // Write your code here
+        return new ArrayList<>();
+    }
+}`;
+
 const languageMap: Record<Language, string> = {
   javaScript: starterCodeAcceptableSeatingJS,
   python: starterCodeAcceptableSeatingPython,
   cpp: starterCodeAcceptableSeatingCPP,
+  java: starterCodeAcceptableSeatingJava,
 };
 
 export const acceptableSeatingArrangements: Problem = {
