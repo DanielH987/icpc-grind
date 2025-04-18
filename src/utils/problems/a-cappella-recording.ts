@@ -23,10 +23,18 @@ int minRecordings(int n, int d, vector<int>& pitches) {
     return 0;
 }`;
 
+const starterCodeACappellaRecordingJava = `public class Solution {
+    public static int minRecordings(int n, int d, int[] pitches) {
+        // Write your code here
+        return 0;
+    }
+}`;
+
 const languageMap: Record<Language, string> = {
   javaScript: starterCodeACappellaRecordingJS,
   python: starterCodeACappellaRecordingPython,
   cpp: starterCodeACappellaRecordingCPP,
+  java: starterCodeACappellaRecordingJava,
 };
 
 export const getStarterCode = (language: Language): string => {
