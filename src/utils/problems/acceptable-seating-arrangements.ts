@@ -46,6 +46,7 @@ export const acceptableSeatingArrangements: Problem = {
     <p class='mt-3'>
       Charlie is managing a classroom. The seats in the classroom are arranged in a grid with <code>r</code> rows and <code>c</code> columns. Each student has a distinct height.
     </p>
+    <br />
     <p>
       A configuration of students is considered <strong>acceptable</strong> if the following conditions are met:
       <br /><br />
@@ -56,11 +57,16 @@ export const acceptableSeatingArrangements: Problem = {
     </p>
     <br />
     <p>
-      The students are initially seated in an acceptable configuration. Charlie wants to rearrange them into a different acceptable configuration. To do so, he can swap any two students.
-      However, after <em>each</em> swap, the arrangement must remain acceptable.
+      The students are initially seated in an acceptable arrangement. Charlie wants to rearrange students into a different acceptable arrangement. To do this, he can swap any two students.
+      However, he wants to ensure that the configuration stays acceptable after each swap.
     </p>
+    <br />
     <p>
-      Your task is to help Charlie transform the original arrangement into the target one by listing a sequence of valid swaps. You may use up to <code>10⁴</code> swaps. You do not need to minimize the number of swaps.
+      Help Charlie devise a strategy to move the students from the original arrangement to his preferred arrangement. You don’t need to minimize the number of swaps, but you are limited to at most <code>10⁴</code> swaps
+    </p>
+    <br />
+    <p>
+      It can be proven that this is always possible for all possible inputs that satisfy the input constraints.
     </p>
   `,
   examples: [
