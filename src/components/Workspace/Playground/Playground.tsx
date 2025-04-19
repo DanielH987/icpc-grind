@@ -6,6 +6,7 @@ import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 import { cpp } from '@codemirror/lang-cpp';
+import { java } from '@codemirror/lang-java';
 import EditorFooter from './EditorFooter';
 import { Problem } from '@/utils/types/problem';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -25,7 +26,7 @@ export interface ISettings {
     fontSize: string;
     settingModalIsOpen: boolean;
     dropdownIsOpen: boolean;
-    language: 'javaScript' | 'python' | 'cpp';
+    language: 'javaScript' | 'python' | 'cpp' | 'java';
 };
 
 const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved }) => {
@@ -52,6 +53,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
             case 'javaScript': return javascript();
             case 'python': return python();
             case 'cpp': return cpp();
+            case 'java': return java();
             default: return javascript();
         }
     };
@@ -147,7 +149,8 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
     useEffect(() => {
         const code = localStorage.getItem(`code-${user?.uid || 'guest'}-${pid}-${settings.language}`);
         if (user) {
-            setUserCode(code ? JSON.parse(code) : problem.starterCode[settings.language]);
+            const starterCode = problem.starterCode[settings.language] || '';
+            setUserCode(code ? JSON.parse(code) : starterCode);
         } else {
             setUserCode(problem.starterCode[settings.language]);
         }
@@ -163,7 +166,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
         setStoredLanguage(settings.language);
     }, [setStoredLanguage, settings.language]);
 
-    const onCHange = (value: string) => {
+    const onChange = (value: string) => {
         setUserCode(value);
         localStorage.setItem(`code-${user?.uid || 'guest'}-${pid}-${settings.language}`, JSON.stringify(value));
     };
@@ -177,7 +180,7 @@ const Playground: React.FC<PlaygroundProps> = ({ problem, setSuccess, setSolved 
                     <CodeMirror
                         value={userCode}
                         theme={vscodeDark}
-                        onChange={onCHange}
+                        onChange={onChange}
                         extensions={[getLanguageExtension()]}
                         style={{ fontSize: settings.fontSize }}
                     />
